@@ -29,17 +29,10 @@ const handleUserLogin = async (req, res) => {
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
-      expiresIn: "10m",
+      expiresIn: "15m",
     }
   );
-  // const refreshToken = jwt.sign(
-  //   { name: user.name },
-  //   process.env.REFRESH_TOKEN_SECRET,
-  //   { expiresIn: "1d" }
-  // );
 
-  user.accessToken = accessToken;
-  await user.save();
 
   res.status(201).json({
     message: "Login successful",
