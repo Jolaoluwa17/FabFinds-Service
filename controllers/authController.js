@@ -33,7 +33,6 @@ const handleUserLogin = async (req, res) => {
     }
   );
 
-
   res.status(201).json({
     message: "Login successful",
     accessToken: accessToken,
@@ -41,4 +40,42 @@ const handleUserLogin = async (req, res) => {
   });
 };
 
-module.exports = { handleUserLogin };
+const handleAdminLogin = async (req, res) => {
+  const foundUser = await User.findOne(req.body.email);
+
+  if (!foundUser) {
+    return res.status(404).json({ message: "User not found" });
+  }
+  const roles = Object.values(foundUser.roles);
+
+  const accessToken = jwt.sign(
+    {
+      UserInfo: {
+        name: foundUser.name,
+        roles: roles,
+      },
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: "5m" }
+  );
+  const refreshToken = jwt.sign(
+    { name: foundUser.name },
+    process.env.REFRESH_TOKEN_SECRET,
+    { expiresIn: "1d" }
+  );
+
+  //Saving refreshToken with current user
+  foundUser.refreshToken = refreshToken;
+  const result = await foundUser.save();
+
+  //Saving refresh tokens with current users
+  res.cookie("jwt", refreshToken, {
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000,
+    sameSite: "None",
+    secure: true,
+  });
+  res.json({ accessToken });
+};
+
+module.exports = { handleUserLogin, handleAdminLogin };

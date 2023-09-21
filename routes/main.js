@@ -7,6 +7,7 @@ const CollectionRouter = require("./collection");
 const ForgotPasswordRouter = require("./forgotPassword");
 const CategoryRouter = require("./category");
 const OtpRouter = require("./otp");
+const RefreshRouter = require("./refresh");
 
 const routes = ({ app }) => {
   app.use("/", AuthRouter);
@@ -18,6 +19,7 @@ const routes = ({ app }) => {
   app.use("/category", CategoryRouter);
   app.use("/forgotpassword", ForgotPasswordRouter);
   app.use("/otp", OtpRouter);
+  app.use("/refresh", RefreshRouter);
 };
 
 module.exports = { routes };

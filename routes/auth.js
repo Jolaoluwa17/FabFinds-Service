@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const passport = require("passport");
 const registerController = require("../controllers/registerController");
 const authController = require("../controllers/authController");
 
@@ -11,6 +10,9 @@ router.post("/user/signup", registerController.handleNewUser);
 router.post("/admin/signup", registerController.handleNewAdmin);
 
 // Sign in with email/username and password for user
-router.post("/user/signin", authController.handleUserLogin);
+router.post("/user/login", authController.handleUserLogin);
+
+// Login with email/username and password for admin
+router.post("/admin/login", authController.handleAdminLogin);
 
 module.exports = router;
