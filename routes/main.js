@@ -8,9 +8,12 @@ const ForgotPasswordRouter = require("./forgotPassword");
 const CategoryRouter = require("./category");
 const OtpRouter = require("./otp");
 const RefreshRouter = require("./refresh");
+const LogoutRouter = require("./logout");
 
 const routes = ({ app }) => {
   app.use("/", AuthRouter);
+  app.use("/refresh", RefreshRouter);
+  app.use("/logout", LogoutRouter);
   app.use("/user", UserRouter);
   app.use("/product", ProductRouter);
   app.use("/review", ReviewRouter);
@@ -19,7 +22,6 @@ const routes = ({ app }) => {
   app.use("/category", CategoryRouter);
   app.use("/forgotpassword", ForgotPasswordRouter);
   app.use("/otp", OtpRouter);
-  app.use("/refresh", RefreshRouter);
 };
 
 module.exports = { routes };
