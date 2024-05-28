@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const ROLES_LIST = require("../config/roles_list");
 
 const handleUserLogin = async (req, res) => {
   const { name, email, password, phoneNo } = req.body;
@@ -19,6 +20,7 @@ const handleUserLogin = async (req, res) => {
   }
 
   const roles = Object.values(user.roles).filter(Boolean);
+  // console.log(roles);
 
   const accessToken = jwt.sign(
     {
@@ -29,9 +31,17 @@ const handleUserLogin = async (req, res) => {
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
-      expiresIn: "15m",
+      expiresIn: "2m",
     }
   );
+
+  const maxAge = 2 * 60;
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true,
+    maxAge: maxAge * 1000,
+    sameSite: "None",
+    secure: true,
+  });
 
   res.status(201).json({
     message: "Login successful",
@@ -41,12 +51,14 @@ const handleUserLogin = async (req, res) => {
 };
 
 const handleAdminLogin = async (req, res) => {
-  const foundUser = await User.findOne(req.body.email);
+  const foundUser = await User.findOne({ email: req.body.email });
 
   if (!foundUser) {
     return res.status(404).json({ message: "User not found" });
   }
+
   const roles = Object.values(foundUser.roles);
+  console.log(roles);
 
   const accessToken = jwt.sign(
     {
@@ -58,6 +70,7 @@ const handleAdminLogin = async (req, res) => {
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: "5m" }
   );
+
   const refreshToken = jwt.sign(
     { name: foundUser.name },
     process.env.REFRESH_TOKEN_SECRET,
@@ -69,12 +82,21 @@ const handleAdminLogin = async (req, res) => {
   const result = await foundUser.save();
 
   //Saving refresh tokens with current users
-  res.cookie("jwt", refreshToken, {
+  res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000,
     sameSite: "None",
     secure: true,
   });
+
+  const maxAge = 2 * 60;
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true,
+    maxAge: maxAge * 1000,
+    sameSite: "None",
+    secure: true,
+  });
+
   res.json({ accessToken });
 };
 

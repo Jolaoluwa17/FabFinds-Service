@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
     },
     phoneNo: {
       type: String,
@@ -27,7 +28,7 @@ const userSchema = new mongoose.Schema(
       },
       Admin: Number,
     },
-    accessToken: {
+    refreshToken: {
       type: String,
       required: false,
     },

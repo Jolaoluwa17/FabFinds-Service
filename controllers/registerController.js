@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
+const ROLES_LIST = require("../config/roles_list");
 
 const handleNewUser = async (req, res) => {
   const { name, email, phoneNo, password, roles } = req.body;
@@ -30,7 +31,7 @@ const handleNewUser = async (req, res) => {
       email,
       phoneNo,
       password: hashedPassword,
-      roles: { User: 2003 },
+      roles: { User: ROLES_LIST.User },
       otp: null,
       accessToken: null,
     });
@@ -68,14 +69,14 @@ const handleNewAdmin = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     // create a new user
-    const newAdmin = new Admin({
+    const newAdmin = new User({
       name,
       email,
       phoneNo,
       password: hashedPassword,
-      roles: { User: 2003, Admin: 1772 },
+      roles: { User: ROLES_LIST.User, Admin: ROLES_LIST.Admin },
       otp: null,
-      accessToken: null,
+      refreshToken: null,
     });
 
     // save admin to the database
