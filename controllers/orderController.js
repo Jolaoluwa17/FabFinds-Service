@@ -65,6 +65,45 @@ const updateOrder = async (req, res) => {
   }
 };
 
+const shippedOrder = async (req, res) => {
+  try {
+    const updatedOrder = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status: "Shipped" },
+      { new: true }
+    );
+    return res.status(200).json(updatedOrder);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+const deliveredOrder = async (req, res) => {
+  try {
+    const updatedOrder = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status: "Delivered" },
+      { new: true }
+    );
+    return res.status(200).json(updatedOrder);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+const canceledOrder = async (req, res) => {
+  try {
+    const updatedOrder = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status: "Canceled" },
+      { new: true }
+    );
+    return res.status(200).json(updatedOrder);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
 // DELETE order
 const deleteOrder = async (req, res) => {
   try {
@@ -86,4 +125,7 @@ module.exports = {
   createNewOrder,
   deleteOrder,
   updateOrder,
+  shippedOrder,
+  deliveredOrder,
+  canceledOrder,
 };

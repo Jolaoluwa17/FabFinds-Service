@@ -1,83 +1,81 @@
 const Otp = require("../models/Otp");
 const User = require("../models/User");
-const nodeMailer = require("nodemailer");
-const { google } = require("googleapis");
-const emailController = require("../utils/emailTemplate");
-
-const CLIENT_ID = process.env.GOOGLE_API_CLIENT_ID;
-const CLIENT_SECRET = process.env.GOOGLE_API_CLIENT_SECRET;
-const REFRESH_TOKEN = process.env.GOOGLE_API_REFRESH_TOKEN;
-const REDIRECT_URI = process.env.REDIRECT_URI;
-
-const MY_EMAIL = "olusanyajolaoluwa17@gmail.com";
-// const to = "olusanyaemmanuel78@gmail.com";
-
-const oAuth2Client = new google.auth.OAuth2(
-  CLIENT_ID,
-  CLIENT_SECRET,
-  REDIRECT_URI
-);
-
-oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+const { Novu } = require("@novu/node");
+const novuRoot = new Novu(process.env.NOVU_API_KEY);
 
 const sendOtp = async (req, res) => {
-  try {
-    const { email } = req.body;
+  const { email } = req.body; // Assuming email is sent in the request body
 
-    // Find the user by email in the database
+  if (!email) {
+    return res.status(400).json({ message: "Email is required" });
+  }
+  try {
+    // Find the user by email
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: "user not found" });
-    } else if (user && user.email) {
-      const to = user.email;
-      const userName = user.name;
-      const userId = user._id;
-      // console.log(to, userName);
-      const generatedOtp = Math.floor(100000 + Math.random() * 900000);
-      const newOtp = new Otp({
-        otp: generatedOtp,
-        user: userId,
-      });
-      const savedOtp = await newOtp.save();
-      const updatedUser = await User.findByIdAndUpdate(
-        userId,
-        { $set: { otp: savedOtp._id } },
-        { new: true }
-      );
-      const ACCESS_TOKEN = await oAuth2Client.getAccessToken();
-      const transport = nodeMailer.createTransport({
-        service: "gmail",
-        auth: {
-          type: "OAuth2",
-          user: MY_EMAIL,
-          clientId: CLIENT_ID,
-          clientSecret: CLIENT_SECRET,
-          refreshToken: REFRESH_TOKEN,
-          accessToken: ACCESS_TOKEN,
-        },
-        tls: {
-          rejectUnauthorized: true,
-        },
-      });
-      //EMAIL OPTIONS
-      const from = MY_EMAIL;
-      const subject = "Password Reset";
-      const html = emailController.emailTemplate(generatedOtp, userName);
-      return new Promise((resolve, reject) => {
-        transport.sendMail({ from, subject, to, html }, (err, info) => {
-          if (err) reject(err);
-          resolve(info);
-        });
-        res.status(200).json({
-          message: "Email sent successfully",
-          otp: savedOtp,
-          updatedUser: updatedUser,
-        });
-      });
+      return res.status(404).json({ message: "User not found" });
     }
-  } catch (err) {
-    res.status(500).json(err);
+
+    // Generate OTP (this is a placeholder, implement your OTP generation logic)
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Save OTP to database (assuming you save OTP in your database)
+    const newOtp = new Otp({ user: user._id, otp, createdAt: new Date() });
+    const savedOtp = await newOtp.save();
+
+    // Update the user's otp field
+    user.otp = savedOtp._id;
+    await user.save();
+
+    // Send OTP using Novu
+    await novuRoot.trigger("password-reset", {
+      to: {
+        subscriberId: user._id, // Assuming user._id is the unique identifier
+        email: user.email,
+      },
+      payload: {
+        name: user.name, // Use name if available, otherwise email
+        OTP: otp,
+      },
+    });
+    res.status(200).json({ message: "OTP sent successfully" });
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
-module.exports = { sendOtp };
+const verifyOtp = async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.status(400).json({ message: "Email and OTP are required" });
+  }
+
+  try {
+    // Find the user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Find the OTP for the user
+    const foundOtp = await Otp.findOne({ user: user._id, otp });
+    if (!foundOtp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    // OTP is valid, proceed with desired action
+    // For example, mark OTP as used by deleting it and clearing it from user
+    await Otp.findByIdAndDelete(foundOtp._id);
+    user.otp = null;
+    await user.save();
+
+    res.status(200).json({ message: "OTP verified successfully" });
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+module.exports = { sendOtp, verifyOtp };

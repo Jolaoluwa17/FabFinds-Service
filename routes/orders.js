@@ -12,6 +12,12 @@ router
   .put(orderController.updateOrder)
   .delete(orderController.deleteOrder);
 
+router.route("/shipped/:id").put(orderController.shippedOrder);
+
+router.route("/delivered/:id").put(orderController.deliveredOrder);
+
+router.route("/canceled/:id").put(orderController.canceledOrder);
+
 router.route("/user/:id").get(orderController.getOrderByUserId);
 
 module.exports = router;

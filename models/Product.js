@@ -19,11 +19,13 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    productImg: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "ProductImg",
-      required: true,
-    },
+    productImg: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ProductImg",
+        required: true,
+      },
+    ],
   },
   { timestamps: true }
 );

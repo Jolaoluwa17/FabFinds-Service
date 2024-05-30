@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Otp = require("./Otp");
 
 const userSchema = new mongoose.Schema(
   {

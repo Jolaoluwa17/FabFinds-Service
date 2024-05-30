@@ -1,6 +1,7 @@
 const AuthRouter = require("./auth");
 const UserRouter = require("./user");
 const ProductRouter = require("./product");
+const ProductImgRouter = require("./productImg");
 const ReviewRouter = require("./review");
 const OrderRouter = require("./orders");
 const CollectionRouter = require("./collection");
@@ -16,6 +17,7 @@ const routes = ({ app }) => {
   app.use("/logout", LogoutRouter);
   app.use("/user", UserRouter);
   app.use("/product", ProductRouter);
+  app.use("/productImg", ProductImgRouter);
   app.use("/review", ReviewRouter);
   app.use("/order", OrderRouter);
   app.use("/collection", CollectionRouter);

@@ -24,7 +24,7 @@ const getOtpUserId = async (req, res) => {
     if (!otp) {
       return res.status(404).json({ message: "otp not found" });
     }
-    return res.status(200).json(otp);
+    return res.status(200).json({ message: "otp verified" });
   } catch (err) {
     return res.status(500).json(err);
   }
