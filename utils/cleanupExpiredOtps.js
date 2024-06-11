@@ -6,9 +6,9 @@ const cleanupExpiredOtps = () => {
   // Schedule a cron job to run every minute
   cron.schedule("* * * * *", async () => {
     try {
-      // Find expired OTPs (older than 2 minutes)
+      // Find expired OTPs where expired field is true
       const expiredOtps = await Otp.find({
-        createdAt: { $lt: new Date(Date.now() - 2 * 60 * 1000) },
+        expired: true,
       });
 
       for (const otp of expiredOtps) {

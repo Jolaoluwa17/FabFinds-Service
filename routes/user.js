@@ -5,11 +5,11 @@ const verifyJWT = require("../middlewares/verifyJWT");
 const ROLES_LIST = require("../config/roles_list");
 const verifyRoles = require("../middlewares/verifyRoles");
 
-router.route("/").get(
-  verifyJWT,
-  verifyRoles(ROLES_LIST.Admin),
-  userController.getAllUsers
-);
+router
+  .route("/")
+  .get(verifyJWT, verifyRoles(ROLES_LIST.User), userController.getAllUsers);
+
+router.route("/me").get(verifyJWT, userController.getLoggedInUser);
 
 router
   .route("/:id")

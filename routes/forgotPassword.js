@@ -3,7 +3,6 @@ const forgotPasswordController = require("../controllers/forgotPasswordControlle
 
 router.route("/send-otp").post(forgotPasswordController.sendOtp);
 
-router.post('/verify-otp', forgotPasswordController.verifyOtp);
-
+router.route("/verify-otp").post(forgotPasswordController.verifyOtp);
 
 module.exports = router;

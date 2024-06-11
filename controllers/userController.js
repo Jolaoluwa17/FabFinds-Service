@@ -1,4 +1,14 @@
 const User = require("../models/User");
+const verifyJWT = require("../middlewares/verifyJWT");
+
+// GET user when logged in
+const getLoggedInUser = (req, res) => {
+  if (!req?.user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+  const username = req.user;
+  return res.status(200).json({ username: username });
+};
 
 // GET all users
 const getAllUsers = async (req, res) => {
@@ -61,4 +71,10 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { getAllUsers, getUser, updateUser, deleteUser };
+module.exports = {
+  getAllUsers,
+  getUser,
+  updateUser,
+  deleteUser,
+  getLoggedInUser,
+};

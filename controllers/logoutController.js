@@ -1,29 +1,49 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-const handleLogout = async (res, req) => {
+const handleLogout = async (req, res) => {
   // On client, also delete the accessToken
   const cookies = req.cookies;
-  if (!cookies?.jwt) return res.sendStatus(204); //No content
-  const refreshToken = cookies.jwt;
-
+  // console.log(cookies);
+  if (!cookies?.accessToken) return res.sendStatus(204); // No content
+  if (!cookies?.refreshToken) return res.sendStatus(204);
+  const refreshToken = cookies.refreshToken;
+  
   // Is refreshToken in db?
   const foundUser = await User.findOne({ refreshToken }).exec();
   if (!foundUser) {
-    res.clearCookie("jwt", { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      maxAge: 2 * 60 * 1000,
+      sameSite: "None",
+      secure: true,
+    });
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+      sameSite: "None",
+      secure: true,
+    });
     return res.sendStatus(204);
   }
 
   // Delete refreshToken in db
-  foundUser.refreshToken = "";
+  foundUser.refreshToken = null;
   const result = await foundUser.save();
 
-  res.clearCookie("jwt", {
+  res.clearCookie("refreshToken", {
     httpOnly: true,
     sameSite: "None",
     secure: true,
     maxAge: 24 * 60 * 60 * 1000,
-  }); //secure: true - only serves on https
+  });
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    sameSite: "None",
+    secure: true,
+    maxAge: 2 * 60 * 1000,
+  });
+  //secure: true - only serves on https
   res.sendStatus(204);
 };
 

@@ -4,7 +4,7 @@ const connectDB = require("./migrations/index.js");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const corsOptions = require("./config/corsOptions.js");
-const cleanupExpiredOtps = require("./utils/cleanupExpiredOtps");
+// const cleanupExpiredOtps = require("./utils/cleanupExpiredOtps");
 
 app.use(cors(corsOptions)); // Use cors middleware
 
@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Start the cron job to clean up expired OTPs
-cleanupExpiredOtps();
+// cleanupExpiredOtps();
 
 const { routes } = require("./routes/main.js");
 

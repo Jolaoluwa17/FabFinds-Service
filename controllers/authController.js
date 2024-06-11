@@ -1,7 +1,6 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const ROLES_LIST = require("../config/roles_list");
 
 const handleUserLogin = async (req, res) => {
   const { name, email, password, phoneNo } = req.body;
@@ -20,7 +19,6 @@ const handleUserLogin = async (req, res) => {
   }
 
   const roles = Object.values(user.roles).filter(Boolean);
-  // console.log(roles);
 
   const accessToken = jwt.sign(
     {
@@ -46,7 +44,6 @@ const handleUserLogin = async (req, res) => {
   res.status(201).json({
     message: "Login successful",
     accessToken: accessToken,
-    user: user,
   });
 };
 
@@ -58,7 +55,7 @@ const handleAdminLogin = async (req, res) => {
   }
 
   const roles = Object.values(foundUser.roles);
-  console.log(roles);
+  // console.log(roles);
 
   const accessToken = jwt.sign(
     {
@@ -97,7 +94,10 @@ const handleAdminLogin = async (req, res) => {
     secure: true,
   });
 
-  res.json({ accessToken });
+  res.json({
+    accessToken: accessToken,
+    refreshToken: refreshToken,
+  });
 };
 
 module.exports = { handleUserLogin, handleAdminLogin };

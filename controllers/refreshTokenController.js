@@ -12,8 +12,7 @@ const handleRefreshToken = async (req, res) => {
   if (!foundUser) return res.sendStatus(403); // Forbidden
   // evaluate jwt
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
-    if (err || foundUser.name !== decoded.name)
-      return res.sendStatus(403);
+    if (err || foundUser.name !== decoded.name) return res.sendStatus(403);
     const roles = Object.values(foundUser.roles);
     const accessToken = jwt.sign(
       {
@@ -32,7 +31,7 @@ const handleRefreshToken = async (req, res) => {
       sameSite: "None",
       secure: true,
     });
-    res.json({ accessToken });
+    res.json({ accessToken: accessToken, refreshToken: refreshToken });
   });
 };
 
