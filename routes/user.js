@@ -11,6 +11,10 @@ router
 
 router.route("/me").get(verifyJWT, userController.getLoggedInUser);
 
+router.route("/send-verify-email").post(userController.sendVerifyEmail);
+
+router.route("/verify-account").post(userController.verifyEmail);
+
 router
   .route("/:id")
   .get(userController.getUser)

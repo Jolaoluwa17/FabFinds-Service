@@ -1,4 +1,3 @@
-const Otp = require("../models/Otp");
 const User = require("../models/User");
 const { Novu } = require("@novu/node");
 const bcrypt = require("bcryptjs");
@@ -17,17 +16,17 @@ const sendOtp = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    if (user.otp) {
+      // Clear user's otp field
+      user.otp = null;
+      await user.save();
+    }
+
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     const encryptedOtp = await bcrypt.hash(otp, saltRounds);
 
-    const newOtp = new Otp({
-      user: user._id,
-      otp: encryptedOtp,
-    });
-    const savedOtp = await newOtp.save();
-
-    user.otp = savedOtp._id;
+    user.otp = encryptedOtp;
     await user.save();
 
     await novuRoot.trigger("password-reset", {
@@ -49,10 +48,12 @@ const sendOtp = async (req, res) => {
 };
 
 const verifyOtp = async (req, res) => {
-  const { email, otp } = req.body;
+  const { email, otp, newPassword } = req.body;
 
-  if (!email || !otp) {
-    return res.status(400).json({ message: "Email and OTP are required" });
+  if (!email || !otp || !newPassword) {
+    return res
+      .status(400)
+      .json({ message: "Email, OTP, and newPassword are required" });
   }
 
   try {
@@ -62,32 +63,30 @@ const verifyOtp = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Find the OTP for the user
-    const foundOtp = await Otp.findOne({ user: user._id });
-    if (!foundOtp) {
-      return res.status(400).json({ message: "Invalid OTP" });
-    }
-
-    if (foundOtp.expired) {
-      // Update the user's otp field to null and delete the expired OTP
-      await User.findByIdAndUpdate(user._id, { otp: null });
-      await Otp.findByIdAndDelete(foundOtp._id);
-      return res.status(400).json({ message: "OTP has expired" });
-    }
-
     // Compare the provided OTP with the stored hashed OTP
-    const isMatch = await bcrypt.compare(otp, foundOtp.otp);
+    const isMatch = await bcrypt.compare(otp, user.otp);
+
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid OTP" });
     }
 
-    // OTP is valid, proceed with desired action
-    // For example, mark OTP as used by deleting it and clearing it from user
-    await Otp.findByIdAndDelete(foundOtp._id);
+    await novuRoot.trigger("password-change-successfull", {
+      to: {
+        subscriberId: user._id,
+        email: user.email,
+      },
+      payload: {
+        name: user.name,
+      },
+    });
+
+    // Now update the user's password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
     user.otp = null;
     await user.save();
 
-    res.status(200).json({ message: "OTP verified successfully" });
+    res.status(200).json({ message: "Password updated successfully" });
   } catch (error) {
     console.error("Error verifying OTP:", error);
     res.status(500).json({ message: "Internal server error" });

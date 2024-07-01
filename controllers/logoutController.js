@@ -4,11 +4,15 @@ const User = require("../models/User");
 const handleLogout = async (req, res) => {
   // On client, also delete the accessToken
   const cookies = req.cookies;
-  // console.log(cookies);
-  if (!cookies?.accessToken) return res.sendStatus(204); // No content
-  if (!cookies?.refreshToken) return res.sendStatus(204);
-  const refreshToken = cookies.refreshToken;
   
+  if (cookies.accessToken === "") {
+    return res.sendStatus(204);
+  } 
+  if (!cookies.refreshToken === "") {
+    return res.sendStatus(204);
+  }
+  const refreshToken = cookies.refreshToken;
+
   // Is refreshToken in db?
   const foundUser = await User.findOne({ refreshToken }).exec();
   if (!foundUser) {
@@ -30,21 +34,21 @@ const handleLogout = async (req, res) => {
   // Delete refreshToken in db
   foundUser.refreshToken = null;
   const result = await foundUser.save();
-
-  res.clearCookie("refreshToken", {
-    httpOnly: true,
-    sameSite: "None",
-    secure: true,
-    maxAge: 24 * 60 * 60 * 1000,
-  });
   res.clearCookie("accessToken", {
     httpOnly: true,
     sameSite: "None",
     secure: true,
     maxAge: 2 * 60 * 1000,
   });
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    sameSite: "None",
+    secure: true,
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+
   //secure: true - only serves on https
-  res.sendStatus(204);
+  res.sendStatus(200);
 };
 
 module.exports = { handleLogout };

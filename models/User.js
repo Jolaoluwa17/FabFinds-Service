@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const Otp = require("./Otp");
 
 const userSchema = new mongoose.Schema(
   {
@@ -34,12 +33,29 @@ const userSchema = new mongoose.Schema(
       required: false,
     },
     otp: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Otp",
+      type: String,
+      default: null,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }
 );
+
+// otp is changed to null after 2 minutes to signify it has expired
+userSchema.post("save", function (doc) {
+  if (doc.otp) {
+    setTimeout(async () => {
+      try {
+        await mongoose.model("User").findByIdAndUpdate(doc._id, { otp: null });
+      } catch (error) {
+        console.error("Error updating OTP expiration:", error);
+      }
+    }, 2 * 60 * 1000); // 2 minutes in milliseconds
+  }
+});
 
 const User = mongoose.model("User", userSchema);
 

@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const ROLES_LIST = require("../config/roles_list");
+const { Novu } = require("@novu/node");
+const novuRoot = new Novu(process.env.NOVU_API_KEY);
 
 const handleNewUser = async (req, res) => {
   const { name, email, phoneNo, password, roles } = req.body;
@@ -12,7 +14,7 @@ const handleNewUser = async (req, res) => {
   if (existingUser) {
     return res
       .status(409)
-      .json({ message: "user already exists", status: 409 });
+      .json({ message: "User already exists", status: 409 });
   }
 
   try {
@@ -38,10 +40,33 @@ const handleNewUser = async (req, res) => {
 
     // save user to the database
     const savedUser = await newUser.save();
-    res.status(201).json({ user: savedUser, message: "sign-up completed" });
+
+    // Generate a new OTP
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+
+    // Encrypt the OTP using bcrypt
+    const encryptedOtp = await bcrypt.hash(otp, 10);
+
+    // Save encrypted OTP to user's verifiedOtp field
+    savedUser.otp = encryptedOtp;
+    await savedUser.save();
+
+    // send OTP to the user's email
+    await novuRoot.trigger("verify-account", {
+      to: {
+        subscriberId: savedUser._id,
+        email: savedUser.email,
+      },
+      payload: {
+        name: savedUser.name,
+        OTP: otp,
+      },
+    });
+
+    res.status(201).json({ user: savedUser, message: "Sign-up completed" });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "server error", error: error });
+    res.status(500).json({ message: "Server error", error: error });
   }
 };
 
@@ -55,7 +80,7 @@ const handleNewAdmin = async (req, res) => {
   if (existingAdmin) {
     return res
       .status(409)
-      .json({ message: "admin already exists", status: 409 });
+      .json({ message: "Admin already exists", status: 409 });
   }
 
   try {
@@ -81,7 +106,7 @@ const handleNewAdmin = async (req, res) => {
 
     // save admin to the database
     const savedAdmin = await newAdmin.save();
-    res.status(201).json({ admin: savedAdmin, message: "sign-up completed" });
+    res.status(201).json({ admin: savedAdmin, message: "Sign-up completed" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "server error", error: error });

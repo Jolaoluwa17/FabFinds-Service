@@ -18,6 +18,10 @@ const handleUserLogin = async (req, res) => {
     return res.status(401).json({ message: "Incorrect password" });
   }
 
+  if (!user.isVerified) {
+    return res.status(401).json({ message: "User not verified" });
+  }
+
   const roles = Object.values(user.roles).filter(Boolean);
 
   const accessToken = jwt.sign(
