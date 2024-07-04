@@ -5,7 +5,7 @@ const handleLogout = async (req, res) => {
   // On client, also delete the accessToken
   const cookies = req.cookies;
   
-  if (cookies.accessToken === "") {
+  if (!cookies.accessToken === "") {
     return res.sendStatus(204);
   } 
   if (!cookies.refreshToken === "") {
