@@ -1,10 +1,8 @@
-const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
 const handleLogout = async (req, res) => {
   // On client, also delete the accessToken
   const cookies = req.cookies;
-  console.log(cookies.accessToken)
 
   if (cookies.accessToken !== "") {
     res.clearCookie("accessToken", {
@@ -15,7 +13,7 @@ const handleLogout = async (req, res) => {
     });
     return res.sendStatus(204);
   }
-  if (!cookies.refreshToken === "") {
+  if (cookies.refreshToken === "") {
     return res.sendStatus(204);
   }
   const refreshToken = cookies.refreshToken;

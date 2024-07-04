@@ -3,13 +3,15 @@ const User = require("../models/User");
 
 const handleRefreshToken = async (req, res) => {
   const cookies = req.cookies;
-  // console.log(cookies)
+
   if (!cookies?.refreshToken) return res.sendStatus(401);
   const refreshToken = cookies.refreshToken;
-  // console.log(refreshToken);
 
   const foundUser = await User.findOne({ refreshToken });
-  if (!foundUser) return res.sendStatus(403); // Forbidden
+  if (!foundUser) {
+    return res.sendStatus(403);
+  } // Forbidden
+
   // evaluate jwt
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
     if (err || foundUser.name !== decoded.name) return res.sendStatus(403);
