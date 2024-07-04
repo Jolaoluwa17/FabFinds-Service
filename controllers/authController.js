@@ -43,6 +43,7 @@ const handleUserLogin = async (req, res) => {
     maxAge: maxAge * 1000,
     sameSite: "None",
     secure: true,
+    partitioned: true,
   });
 
   res.status(201).json({
@@ -88,6 +89,7 @@ const handleAdminLogin = async (req, res) => {
     maxAge: 24 * 60 * 60 * 1000,
     sameSite: "None",
     secure: true,
+    partitioned: true,
   });
 
   const maxAge = 2 * 60;
@@ -96,6 +98,7 @@ const handleAdminLogin = async (req, res) => {
     maxAge: maxAge * 1000,
     sameSite: "None",
     secure: true,
+    partitioned: true,
   });
 
   res.json({
