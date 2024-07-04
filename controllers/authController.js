@@ -41,7 +41,7 @@ const handleUserLogin = async (req, res) => {
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
     maxAge: maxAge * 1000,
-    sameSite: "Strict",
+    sameSite: "none",
     secure: true,
     partitioned: true,
   });
@@ -87,7 +87,7 @@ const handleAdminLogin = async (req, res) => {
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000,
-    sameSite: "Strict",
+    sameSite: "none",
     secure: true,
     partitioned: true,
   });
@@ -96,7 +96,7 @@ const handleAdminLogin = async (req, res) => {
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
     maxAge: maxAge * 1000,
-    sameSite: "Strict",
+    sameSite: "none",
     secure: true,
     partitioned: true,
   });

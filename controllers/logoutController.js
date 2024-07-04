@@ -8,7 +8,7 @@ const handleLogout = async (req, res) => {
     res.clearCookie("accessToken", {
       httpOnly: true,
       maxAge: 2 * 60 * 1000,
-      sameSite: "Strict",
+      sameSite: "none",
       secure: true,
       partitioned: true,
     });
@@ -25,14 +25,14 @@ const handleLogout = async (req, res) => {
     res.clearCookie("accessToken", {
       httpOnly: true,
       maxAge: 2 * 60 * 1000,
-      sameSite: "Strict",
+      sameSite: "none",
       secure: true,
       partitioned: true,
     });
     res.clearCookie("refreshToken", {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
-      sameSite: "Strict",
+      sameSite: "none",
       secure: true,
       partitioned: true,
     });
@@ -44,14 +44,14 @@ const handleLogout = async (req, res) => {
   const result = await foundUser.save();
   res.clearCookie("accessToken", {
     httpOnly: true,
-    sameSite: "Strict",
+    sameSite: "none",
     secure: true,
     maxAge: 2 * 60 * 1000,
     partitioned: true,
   });
   res.clearCookie("refreshToken", {
     httpOnly: true,
-    sameSite: "Strict",
+    sameSite: "none",
     secure: true,
     maxAge: 24 * 60 * 60 * 1000,
     partitioned: true,

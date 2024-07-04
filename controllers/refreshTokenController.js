@@ -32,6 +32,7 @@ const handleRefreshToken = async (req, res) => {
       maxAge: maxAge * 1000,
       sameSite: "None",
       secure: true,
+      partitioned: true,
     });
     res.json({ accessToken: accessToken, refreshToken: refreshToken });
   });
