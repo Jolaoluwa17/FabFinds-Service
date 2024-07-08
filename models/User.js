@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const ROLES_LIST = require("../config/roles_list")
+const ROLES_LIST = require("../config/roles_list");
 
 const userSchema = new mongoose.Schema(
   {
@@ -38,6 +38,14 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
     isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    failedLogin: {
+      type: Number,
+      default: 0,
+    },
+    accountDisabled: {
       type: Boolean,
       default: false,
     },
