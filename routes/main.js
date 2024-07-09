@@ -7,13 +7,9 @@ const OrderRouter = require("./orders");
 const CollectionRouter = require("./collection");
 const ForgotPasswordRouter = require("./forgotPassword");
 const CategoryRouter = require("./category");
-const RefreshRouter = require("./refresh");
-const LogoutRouter = require("./logout");
 
 const routes = ({ app }) => {
-  app.use("/", AuthRouter);
-  app.use("/refresh", RefreshRouter);
-  app.use("/logout", LogoutRouter);
+  app.use("/auth", AuthRouter);
   app.use("/user", UserRouter);
   app.use("/product", ProductRouter);
   app.use("/productImg", ProductImgRouter);

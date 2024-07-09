@@ -319,19 +319,52 @@ const handleUserLogin = async (req, res) => {
  *         description: User not found
  */
 const handleAdminLogin = async (req, res) => {
-  const foundUser = await User.findOne({ email: req.body.email });
+  const { email, password } = req.body;
 
-  if (!foundUser) {
+  const user = await User.findOne({ email });
+
+  if (!user) {
     return res.status(404).json({ message: "User not found" });
   }
 
-  const roles = Object.values(foundUser.roles);
-  // console.log(roles);
+  // Check if the account is disabled
+  if (user.accountDisabled) {
+    return res.status(403).json({
+      message:
+        "Account is disabled due to multiple failed login attempts. Please contact support or verify your OTP.",
+    });
+  }
+
+  // Comparing the provided password with the stored hashed password
+  const passwordMatches = await bcrypt.compare(password, user.password);
+
+  if (!passwordMatches) {
+    // Increment the failedLogin counter
+    user.failedLogin += 1;
+
+    // Check if failedLogin has reached 5
+    if (user.failedLogin >= 5) {
+      user.accountDisabled = true;
+    }
+
+    await user.save();
+
+    return res.status(401).json({ message: "Incorrect password" });
+  }
+
+  user.failedLogin = 0;
+  await user.save();
+
+  if (!user.isVerified) {
+    return res.status(401).json({ message: "User not verified" });
+  }
+
+  const roles = Object.values(user.roles);
 
   const accessToken = jwt.sign(
     {
       UserInfo: {
-        name: foundUser.name,
+        name: user.name,
         roles: roles,
       },
     },
@@ -340,13 +373,13 @@ const handleAdminLogin = async (req, res) => {
   );
 
   const refreshToken = jwt.sign(
-    { name: foundUser.name },
+    { name: user.name },
     process.env.REFRESH_TOKEN_SECRET,
     { expiresIn: "1d" }
   );
 
   //Saving refreshToken with current user
-  foundUser.refreshToken = refreshToken;
+  user.refreshToken = refreshToken;
   await foundUser.save();
 
   //Saving refresh tokens with current users
@@ -373,6 +406,41 @@ const handleAdminLogin = async (req, res) => {
   });
 };
 
+/**
+ * @swagger
+ * /auth/refreshToken:
+ *   get:
+ *     summary: Refresh access token
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 description: Refresh token to generate a new access token
+ *     responses:
+ *       200:
+ *         description: Successful token refresh
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                   description: New access token
+ *                 refreshToken:
+ *                   type: string
+ *                   description: Refresh token
+ *       401:
+ *         description: Unauthorized - Missing or invalid token
+ *       403:
+ *         description: Forbidden - Invalid or expired token
+ */
 const handleRefreshToken = async (req, res) => {
   const cookies = req.cookies;
 
@@ -410,6 +478,20 @@ const handleRefreshToken = async (req, res) => {
   });
 };
 
+/**
+ * @swagger
+ * /auth/logout:
+ *   get:
+ *     summary: Logout user
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Successfully logged out
+ *       204:
+ *         description: No content - Tokens already cleared
+ *       404:
+ *         description: User not found
+ */
 const handleLogout = async (req, res) => {
   // On client, also delete the accessToken
   const cookies = req.cookies;
@@ -427,31 +509,15 @@ const handleLogout = async (req, res) => {
   if (cookies.refreshToken === "") {
     return res.sendStatus(204);
   }
+
   const refreshToken = cookies.refreshToken;
 
   // Is refreshToken in db?
   const foundUser = await User.findOne({ refreshToken }).exec();
-  if (!foundUser) {
-    res.clearCookie("accessToken", {
-      httpOnly: true,
-      maxAge: 2 * 60 * 1000,
-      sameSite: "none",
-      secure: true,
-      partitioned: true,
-    });
-    res.clearCookie("refreshToken", {
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000,
-      sameSite: "none",
-      secure: true,
-      partitioned: true,
-    });
-    return res.sendStatus(204);
-  }
 
   // Delete refreshToken in db
   foundUser.refreshToken = null;
-  const result = await foundUser.save();
+  await foundUser.save();
   res.clearCookie("accessToken", {
     httpOnly: true,
     sameSite: "none",

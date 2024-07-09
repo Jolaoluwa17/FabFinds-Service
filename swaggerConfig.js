@@ -1,6 +1,11 @@
 // swaggerConfig.js
 const swaggerJSDoc = require("swagger-jsdoc");
 
+const config = {
+  hostedUrl: "https://fabfinds-service.onrender.com",
+  baseUrl: "http://localhost:5500"
+}
+
 const options = {
   definition: {
     openapi: "3.0.0",
@@ -11,7 +16,7 @@ const options = {
     },
     servers: [
       {
-        url: "https://fabfinds-service.onrender.com",
+        url: config.hostedUrl,
         description: "Development server",
       },
     ],
