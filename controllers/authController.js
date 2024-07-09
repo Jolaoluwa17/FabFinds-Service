@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const ROLES_LIST = require("../config/roles_list");
 const { Novu } = require("@novu/node");
 const novuRoot = new Novu(process.env.NOVU_API_KEY);
+const saltRounds = 10;
 
 /**
  * @swagger
@@ -537,6 +538,225 @@ const handleLogout = async (req, res) => {
   res.sendStatus(200);
 };
 
+/**
+ * @swagger
+ * /auth/forgot-password/send-otp:
+ *   post:
+ *     summary: Send an OTP to the user's email for password reset
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: OTP sent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "OTP sent successfully"
+ *       400:
+ *         description: Email is required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Email is required"
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User not found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+// Forgot password
+const sendOtp = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: "Email is required" });
+  }
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.otp) {
+      // Clear user's otp field
+      user.otp = null;
+      await user.save();
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    const encryptedOtp = await bcrypt.hash(otp, saltRounds);
+
+    user.otp = encryptedOtp;
+    await user.save();
+
+    await novuRoot.trigger("password-reset", {
+      to: {
+        subscriberId: user._id,
+        email: user.email,
+      },
+      payload: {
+        name: user.name,
+        OTP: otp,
+      },
+    });
+
+    res.status(200).json({ message: "OTP sent successfully" });
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+/**
+ * @swagger
+ * /auth/forgot-password/verify-otp:
+ *   post:
+ *     summary: Verify OTP and reset the user's password
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - otp
+ *               - newPassword
+ *             properties:
+ *               email:
+ *                 type: string
+ *               otp:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Password updated successfully"
+ *       400:
+ *         description: Email, OTP, and newPassword are required or Invalid OTP
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   examples:
+ *                     missing_fields:
+ *                       value: "Email, OTP, and newPassword are required"
+ *                     invalid_otp:
+ *                       value: "Invalid OTP"
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User not found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+const verifyOtp = async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+
+  if (!email || !otp || !newPassword) {
+    return res
+      .status(400)
+      .json({ message: "Email, OTP, and newPassword are required" });
+  }
+
+  try {
+    // Find the user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Compare the provided OTP with the stored hashed OTP
+    const isMatch = await bcrypt.compare(otp, user.otp);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    await novuRoot.trigger("password-change-successfull", {
+      to: {
+        subscriberId: user._id,
+        email: user.email,
+      },
+      payload: {
+        name: user.name,
+      },
+    });
+
+    // Now update the user's password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    user.otp = null;
+    user.accountDisabled = false
+    await user.save();
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   handleUserLogin,
   handleAdminLogin,
@@ -544,4 +764,6 @@ module.exports = {
   handleNewAdmin,
   handleRefreshToken,
   handleLogout,
+  sendOtp,
+  verifyOtp,
 };

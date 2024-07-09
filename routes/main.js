@@ -5,7 +5,6 @@ const ProductImgRouter = require("./productImg");
 const ReviewRouter = require("./review");
 const OrderRouter = require("./orders");
 const CollectionRouter = require("./collection");
-const ForgotPasswordRouter = require("./forgotPassword");
 const CategoryRouter = require("./category");
 
 const routes = ({ app }) => {
@@ -17,7 +16,6 @@ const routes = ({ app }) => {
   app.use("/order", OrderRouter);
   app.use("/collection", CollectionRouter);
   app.use("/category", CategoryRouter);
-  app.use("/forgotpassword", ForgotPasswordRouter);
 };
 
 module.exports = { routes };

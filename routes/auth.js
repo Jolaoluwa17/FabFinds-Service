@@ -2,22 +2,26 @@ const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/authController");
 
-// signup for user
-router.post("/user/signup", authController.handleNewUser);
+// User routes
+const userRouter = express.Router();
+userRouter.post("/signup", authController.handleNewUser);
+userRouter.post("/login", authController.handleUserLogin);
 
-// sign up for admin
-router.post("/admin/signup", authController.handleNewAdmin);
+// Admin routes
+const adminRouter = express.Router();
+adminRouter.post("/signup", authController.handleNewAdmin);
+adminRouter.post("/login", authController.handleAdminLogin);
 
-// Sign in with email and password for user
-router.post("/user/login", authController.handleUserLogin);
-
-// Login with email and password for admin
-router.post("/admin/login", authController.handleAdminLogin);
-
-// Get new refresh token
+// Common auth routes
 router.get("/refreshToken", authController.handleRefreshToken);
-
-// logout
 router.get("/logout", authController.handleLogout);
+
+// OTP routes
+router.post("/forgot-password/send-otp", authController.sendOtp);
+router.post("/forgot-password/verify-otp", authController.verifyOtp);
+
+// Use the user and admin routers
+router.use("/user", userRouter);
+router.use("/admin", adminRouter);
 
 module.exports = router;
