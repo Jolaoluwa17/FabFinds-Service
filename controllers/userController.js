@@ -36,7 +36,8 @@ const getLoggedInUser = (req, res) => {
     return res.status(404).json({ message: "User not found" });
   }
   const username = req.user;
-  return res.status(200).json({ username: username });
+  const userId = req.userId;
+  return res.status(200).json({ username: username, id: userId });
 };
 
 /**

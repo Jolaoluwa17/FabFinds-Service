@@ -1,3 +1,4 @@
+const Cart = require("../models/Cart");
 const Order = require("../models/Order");
 
 // GET all orders
@@ -25,6 +26,47 @@ const createNewOrder = async (req, res) => {
   }
 };
 
+const createOrderFromCart = async (req, res) => {
+  const { cartId } = req.params;
+  const { shippingAddress } = req.body; // Assuming shippingAddress is passed in the request body
+
+  try {
+    // Find the cart by ID
+    const cart = await Cart.findById(cartId).populate("items");
+
+    if (!cart) {
+      return res.status(404).json({ error: "Cart not found" });
+    }
+
+    // Calculate the total price
+    const totalPrice = cart.items.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    );
+
+    // Create a new order
+    const newOrder = new Order({
+      user: cart.user,
+      items: cart.items,
+      totalPrice,
+      shippingAddress,
+      orderDate: new Date(),
+      status: "Pending",
+    });
+
+    // Save the order to the database
+    const savedOrder = await newOrder.save();
+
+    // Clear the items array in the cart
+    cart.items = [];
+    await cart.save();
+
+    res.status(201).json(savedOrder); // Respond with the created order
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 // GET specific order
 const getOrder = async (req, res) => {
   try {
@@ -42,24 +84,29 @@ const getOrder = async (req, res) => {
 const getOrderByUserId = async (req, res) => {
   try {
     const userId = req.params.id;
-    const orders = await Order.find({ user: userId });
+    const orders = await Order.find({ user: userId })
+      .populate({
+        path: "items",
+        populate: {
+          path: "product",
+          select: "name",
+        },
+      })
+      .populate({
+        path: "items",
+        populate: {
+          path: "size",
+          select: "suffix",
+        },
+      })
+      .populate({
+        path: "items",
+        populate: {
+          path: "color",
+          select: "name",
+        },
+      });
     return res.status(200).json(orders);
-  } catch (err) {
-    return res.status(500).json(err);
-  }
-};
-
-// UPDATE order
-const updateOrder = async (req, res) => {
-  try {
-    const updatedOrder = await Order.findByIdAndUpdate(
-      req.params.id,
-      {
-        $set: req.body,
-      },
-      { new: true }
-    );
-    return res.status(200).json(updatedOrder);
   } catch (err) {
     return res.status(500).json(err);
   }
@@ -124,8 +171,8 @@ module.exports = {
   getOrderByUserId,
   createNewOrder,
   deleteOrder,
-  updateOrder,
   shippedOrder,
   deliveredOrder,
   canceledOrder,
+  createOrderFromCart,
 };

@@ -266,6 +266,7 @@ const handleUserLogin = async (req, res) => {
   const accessToken = jwt.sign(
     {
       UserInfo: {
+        id: user._id,
         name: user.name,
         roles: roles,
       },

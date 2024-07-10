@@ -1,15 +1,13 @@
 const router = require("express").Router();
 const orderController = require("../controllers/orderController");
 
-router
-  .route("/")
-  .post(orderController.createNewOrder)
-  .get(orderController.getAllOrder);
+router.route("/").get(orderController.getAllOrder);
+
+router.route("/:cartId").post(orderController.createOrderFromCart);
 
 router
   .route("/:id")
   .get(orderController.getOrder)
-  .put(orderController.updateOrder)
   .delete(orderController.deleteOrder);
 
 router.route("/shipped/:id").put(orderController.shippedOrder);

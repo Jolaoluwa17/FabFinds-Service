@@ -8,6 +8,7 @@ const CollectionRouter = require("./collection");
 const CategoryRouter = require("./category");
 const ColorRouter = require("./color");
 const SizeRouter = require("./size");
+const CartRouter = require("./cart");
 
 const routes = ({ app }) => {
   app.use("/auth", AuthRouter);
@@ -20,6 +21,7 @@ const routes = ({ app }) => {
   app.use("/category", CategoryRouter);
   app.use("/size", SizeRouter);
   app.use("/color", ColorRouter);
+  app.use("/cart", CartRouter);
 };
 
 module.exports = { routes };
