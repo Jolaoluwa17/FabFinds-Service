@@ -26,6 +26,29 @@ const productSchema = new mongoose.Schema(
         required: true,
       },
     ],
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
+    collections: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Collection",
+      },
+    ],
+    sizes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Size",
+      },
+    ],
+    colors: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Color",
+      },
+    ],
   },
   { timestamps: true }
 );

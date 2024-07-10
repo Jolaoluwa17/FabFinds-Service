@@ -6,6 +6,8 @@ const ReviewRouter = require("./review");
 const OrderRouter = require("./orders");
 const CollectionRouter = require("./collection");
 const CategoryRouter = require("./category");
+const ColorRouter = require("./color");
+const SizeRouter = require("./size");
 
 const routes = ({ app }) => {
   app.use("/auth", AuthRouter);
@@ -16,6 +18,8 @@ const routes = ({ app }) => {
   app.use("/order", OrderRouter);
   app.use("/collection", CollectionRouter);
   app.use("/category", CategoryRouter);
+  app.use("/size", SizeRouter);
+  app.use("/color", ColorRouter);
 };
 
 module.exports = { routes };
