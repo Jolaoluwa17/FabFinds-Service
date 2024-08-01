@@ -10,17 +10,6 @@
     "format:verify": "prettier --check .",
     "format": "prettier --write ."
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.{js,jsx}": [
-      "prettier --write",
-      "git add"
-    ]
-  },
   "author": "",
   "license": "ISC",
   "dependencies": {
