@@ -31,7 +31,7 @@ const OrderSchema = new mongoose.Schema(
       default: "Pending",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const order = mongoose.model("order", OrderSchema);

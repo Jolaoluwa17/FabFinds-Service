@@ -2,8 +2,8 @@ const swaggerJSDoc = require("swagger-jsdoc");
 
 const config = {
   hostedUrl: "https://fabfinds-service.onrender.com",
-  baseUrl: "http://localhost:5500"
-}
+  baseUrl: "http://localhost:5500",
+};
 
 const options = {
   definition: {

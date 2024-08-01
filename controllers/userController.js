@@ -453,7 +453,7 @@ const updateUser = async (req, res) => {
       {
         $set: req.body,
       },
-      { new: true }
+      { new: true },
     );
     return res
       .status(200)

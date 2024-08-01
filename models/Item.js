@@ -22,7 +22,7 @@ const itemSchema = new mongoose.Schema(
       ref: "Color",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Item = mongoose.model("Item", itemSchema);

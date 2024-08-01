@@ -149,7 +149,7 @@ const updateCollection = async (req, res) => {
     const updatedCollection = await Collection.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true, runValidators: true } // Added runValidators to ensure the data is valid
+      { new: true, runValidators: true }, // Added runValidators to ensure the data is valid
     );
     if (!updatedCollection) {
       return res.status(404).json({ message: "Collection not found" });

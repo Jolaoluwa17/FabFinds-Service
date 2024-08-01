@@ -2,6 +2,23 @@ const ProductImg = require("../models/ProductImg");
 const Product = require("../models/Product");
 const cloudinary = require("../utils/cloudinary");
 
+// GET image by ID
+const getImageById = async (req, res) => {
+  try {
+    // Find the image document by ID
+    const productImg = await ProductImg.findById(req.params.id);
+    if (!productImg) {
+      return res.status(404).json({ message: "Image not found" });
+    }
+
+    // Return the image document
+    return res.status(200).json(productImg);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "An error occurred", error: err });
+  }
+};
+
 // DELETE specific image by ID
 const deleteImageById = async (req, res) => {
   try {
@@ -36,4 +53,5 @@ const deleteImageById = async (req, res) => {
 
 module.exports = {
   deleteImageById,
+  getImageById,
 };

@@ -6,15 +6,14 @@ const cartSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-    },
-    items: [
+    },items: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Item",
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Cart = mongoose.model("Cart", cartSchema);

@@ -273,11 +273,11 @@ const handleUserLogin = async (req, res) => {
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
-      expiresIn: "2m",
-    }
+      expiresIn: "1d",
+    },
   );
 
-  const maxAge = 2 * 60;
+  const maxAge = 24 * 60 * 60;
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
     maxAge: maxAge * 1000,
@@ -371,13 +371,13 @@ const handleAdminLogin = async (req, res) => {
       },
     },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "5m" }
+    { expiresIn: "5m" },
   );
 
   const refreshToken = jwt.sign(
     { name: user.name },
     process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: "1d" }
+    { expiresIn: "1d" },
   );
 
   //Saving refreshToken with current user
@@ -466,7 +466,7 @@ const handleRefreshToken = async (req, res) => {
         },
       },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "2m" }
+      { expiresIn: "2m" },
     );
     const maxAge = 2 * 60;
     res.cookie("accessToken", accessToken, {
@@ -748,7 +748,7 @@ const verifyOtp = async (req, res) => {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
     user.otp = null;
-    user.accountDisabled = false
+    user.accountDisabled = false;
     await user.save();
 
     res.status(200).json({ message: "Password updated successfully" });

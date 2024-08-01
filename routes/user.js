@@ -17,7 +17,7 @@ router.route("/verify-account").post(userController.verifyEmail);
 
 router
   .route("/:id")
-  .get(verifyJWT, verifyRoles(ROLES_LIST.Admin), userController.getUser)
+  .get(verifyJWT, verifyRoles(ROLES_LIST.User), userController.getUser)
   .put(verifyJWT, verifyRoles(ROLES_LIST.Admin), userController.updateUser)
   .delete(verifyJWT, verifyRoles(ROLES_LIST.Admin), userController.deleteUser);
 

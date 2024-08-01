@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Cart = require("../models/Cart");
 const Item = require("../models/Item");
 
@@ -21,18 +22,11 @@ const createItem = async (product, quantity, price, size, color) => {
 };
 
 const addItemToCart = async (req, res) => {
-  const { user } = req.body;
-  const { product, quantity, price, size, color } = req.body;
+  const { user, product, quantity, price, size, color } = req.body;
 
   try {
-    // Create the item using the createItem function
-    const createdItem = await createItem(product, quantity, price, size, color);
-
-    // Retrieve the ID of the created item
-    const itemId = createdItem._id;
-
     // Find the user's cart or create a new one if it doesn't exist
-    let cart = await Cart.findOne({ user });
+    let cart = await Cart.findOne({ user }).populate("items");
 
     if (!cart) {
       // Create a new cart if it doesn't exist
@@ -40,10 +34,25 @@ const addItemToCart = async (req, res) => {
         user,
         items: [],
       });
+    } else {
+      // Check for duplicate items in the cart
+      const duplicateItem = cart.items.find(
+        (item) =>
+          item.product._id.toString() === product &&
+          item.color.toString() === color &&
+          item.size.toString() === size,
+      );
+
+      if (duplicateItem) {
+        return res.status(400).json({ message: "Item already in cart" });
+      }
     }
 
+    // Create the item using the createItem function
+    const createdItem = await createItem(product, quantity, price, size, color);
+
     // Add the item ID to the cart's items array
-    cart.items.push(itemId);
+    cart.items.push(createdItem._id);
 
     // Save the updated cart
     const updatedCart = await cart.save();
@@ -65,6 +74,11 @@ const getItemsInCart = async (req, res) => {
         populate: {
           path: "product",
           select: "name productImg",
+          populate: {
+            path: "productImg",
+            model: "ProductImg",
+            select: "fileUrl", // Assuming `url` is the field you want to return
+          },
         },
       })
       .populate({
@@ -98,11 +112,15 @@ const editItem = async (req, res) => {
   const { product, quantity, price, size, color } = req.body;
 
   try {
+    // Validate if the id is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid item ID" });
+    }
     // Find the item by ID and update it with the new details
     const updatedItem = await Item.findByIdAndUpdate(
       id,
       { product, quantity, price, size, color },
-      { new: true, runValidators: true } // Return the updated document and run schema validators
+      { new: true, runValidators: true }, // Return the updated document and run schema validators
     );
 
     if (!updatedItem) {

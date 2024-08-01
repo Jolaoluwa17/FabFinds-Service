@@ -41,7 +41,7 @@ const createOrderFromCart = async (req, res) => {
     // Calculate the total price
     const totalPrice = cart.items.reduce(
       (acc, item) => acc + item.price * item.quantity,
-      0
+      0,
     );
 
     // Create a new order
@@ -117,7 +117,7 @@ const shippedOrder = async (req, res) => {
     const updatedOrder = await Order.findByIdAndUpdate(
       req.params.id,
       { status: "Shipped" },
-      { new: true }
+      { new: true },
     );
     return res.status(200).json(updatedOrder);
   } catch (err) {
@@ -130,7 +130,7 @@ const deliveredOrder = async (req, res) => {
     const updatedOrder = await Order.findByIdAndUpdate(
       req.params.id,
       { status: "Delivered" },
-      { new: true }
+      { new: true },
     );
     return res.status(200).json(updatedOrder);
   } catch (err) {
@@ -143,7 +143,7 @@ const canceledOrder = async (req, res) => {
     const updatedOrder = await Order.findByIdAndUpdate(
       req.params.id,
       { status: "Canceled" },
-      { new: true }
+      { new: true },
     );
     return res.status(200).json(updatedOrder);
   } catch (err) {

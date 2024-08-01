@@ -12,7 +12,7 @@ const collectionSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("Collection", collectionSchema);

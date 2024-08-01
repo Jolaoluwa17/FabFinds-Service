@@ -8,17 +8,17 @@ const verifyRoles = require("../middlewares/verifyRoles");
 router
   .route("/")
   .post(
-    /*verifyJWT, verifyRoles(ROLES_LIST.User),*/ cartController.addItemToCart
+    /*verifyJWT, verifyRoles(ROLES_LIST.User),*/ cartController.addItemToCart,
   );
 
 router
   .route("/:id")
   .get(
-    /*verifyJWT, verifyRoles(ROLES_LIST.User),*/ cartController.getItemsInCart
+    /*verifyJWT, verifyRoles(ROLES_LIST.User),*/ cartController.getItemsInCart,
   )
   .put(/*verifyJWT, verifyRoles(ROLES_LIST.User),*/ cartController.editItem)
   .delete(
-    /*verifyJWT, verifyRoles(ROLES_LIST.User),*/ cartController.deleteItem
+    /*verifyJWT, verifyRoles(ROLES_LIST.User),*/ cartController.deleteItem,
   );
 
 module.exports = router;

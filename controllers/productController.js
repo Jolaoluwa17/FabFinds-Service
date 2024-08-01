@@ -212,7 +212,7 @@ const createNewProduct = async (req, res) => {
 const getProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id).populate(
-      "productImg"
+      "productImg",
     );
 
     if (!product) {
@@ -353,7 +353,7 @@ const updateProduct = async (req, res) => {
         const updatedProduct = await Product.findByIdAndUpdate(
           req.params.id,
           updateData,
-          { new: true }
+          { new: true },
         );
 
         return res.status(200).json({
