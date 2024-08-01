@@ -34,6 +34,11 @@ connectDB();
 
 const port = process.env.ACCESS_PORT || 5500;
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}.`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  const port = process.env.ACCESS_PORT || 5500;
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}.`);
+  });
+}
+
+module.exports = app;

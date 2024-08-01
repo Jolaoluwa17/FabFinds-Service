@@ -7,7 +7,9 @@ const verifyRoles = require('../middlewares/verifyRoles');
 
 router
   .route('/')
-  .get(verifyJWT, verifyRoles(ROLES_LIST.Admin), userController.getAllUsers);
+  .get(
+    /*verifyJWT, verifyRoles(ROLES_LIST.Admin),*/ userController.getAllUsers
+  );
 
 router.route('/me').get(verifyJWT, userController.getLoggedInUser);
 
