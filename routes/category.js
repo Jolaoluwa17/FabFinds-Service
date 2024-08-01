@@ -1,13 +1,13 @@
-const router = require("express").Router();
-const categoryController = require("../controllers/categoryController");
+const router = require('express').Router();
+const categoryController = require('../controllers/categoryController');
 
 router
-  .route("/")
+  .route('/')
   .post(categoryController.createCategory)
   .get(categoryController.getAllCategories);
 
 router
-  .route("/:id")
+  .route('/:id')
   .get(categoryController.getCategory)
   .put(categoryController.updateCategory)
   .delete(categoryController.deleteCategory);

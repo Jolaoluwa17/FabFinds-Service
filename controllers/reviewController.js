@@ -1,11 +1,11 @@
-const Review = require("../models/Review");
+const Review = require('../models/Review');
 
 // GET all reviews
 const getAllReviews = async (req, res) => {
   try {
-    const reviews = await Review.find().populate("user");
+    const reviews = await Review.find().populate('user');
     if (reviews.length === 0) {
-      return res.status(404).json({ message: "no reviews found" });
+      return res.status(404).json({ message: 'no reviews found' });
     }
     return res.status(200).json(reviews);
   } catch (err) {
@@ -28,9 +28,9 @@ const createNewReview = async (req, res) => {
 // GET specific review
 const getReview = async (req, res) => {
   try {
-    const review = await Review.findById(req.params.id).populate("user");
+    const review = await Review.findById(req.params.id).populate('user');
     if (!review) {
-      return res.status(404).json({ message: "review not found" });
+      return res.status(404).json({ message: 'review not found' });
     }
     return res.status(200).json(review);
   } catch (err) {
@@ -42,7 +42,7 @@ const getReview = async (req, res) => {
 const getReviewsByProductId = async (req, res) => {
   try {
     const productId = req.params.productId;
-    const reviews = await Review.find({ product: productId }).populate("user");
+    const reviews = await Review.find({ product: productId }).populate('user');
     return res.status(200).json(reviews);
   } catch (err) {
     return res.status(500).json(err);
@@ -57,7 +57,7 @@ const updateReview = async (req, res) => {
       {
         $set: req.body,
       },
-      { new: true },
+      { new: true }
     );
     return res.status(200).json(updatedReview);
   } catch (err) {
@@ -70,10 +70,10 @@ const deleteReview = async (req, res) => {
   try {
     const review = await Review.findById(req.params.id);
     if (!review) {
-      return res.status(404).json({ message: "review not found" });
+      return res.status(404).json({ message: 'review not found' });
     }
     await review.deleteOne({ _id: req.params.id });
-    return res.status(200).json("review has been deleted...");
+    return res.status(200).json('review has been deleted...');
   } catch (err) {
     return res.status(500).json(err);
   }

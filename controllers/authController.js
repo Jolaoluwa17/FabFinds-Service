@@ -1,8 +1,8 @@
-const User = require("../models/User");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-const ROLES_LIST = require("../config/roles_list");
-const { Novu } = require("@novu/node");
+const User = require('../models/User');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const ROLES_LIST = require('../config/roles_list');
+const { Novu } = require('@novu/node');
 const novuRoot = new Novu(process.env.NOVU_API_KEY);
 const saltRounds = 10;
 
@@ -57,14 +57,14 @@ const handleNewUser = async (req, res) => {
   if (existingUser) {
     return res
       .status(409)
-      .json({ message: "User already exists", status: 409 });
+      .json({ message: 'User already exists', status: 409 });
   }
 
   try {
-    if (!password || typeof password !== "string") {
+    if (!password || typeof password !== 'string') {
       return res
         .status(400)
-        .json({ message: "Password is required and must be a string" });
+        .json({ message: 'Password is required and must be a string' });
     }
 
     const saltRounds = 10;
@@ -95,7 +95,7 @@ const handleNewUser = async (req, res) => {
     await savedUser.save();
 
     // send OTP to the user's email
-    await novuRoot.trigger("verify-account", {
+    await novuRoot.trigger('verify-account', {
       to: {
         subscriberId: savedUser._id,
         email: savedUser.email,
@@ -106,10 +106,10 @@ const handleNewUser = async (req, res) => {
       },
     });
 
-    res.status(201).json({ user: savedUser, message: "Sign-up completed" });
+    res.status(201).json({ user: savedUser, message: 'Sign-up completed' });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Server error", error: error });
+    res.status(500).json({ message: 'Server error', error: error });
   }
 };
 
@@ -157,14 +157,14 @@ const handleNewAdmin = async (req, res) => {
   if (existingAdmin) {
     return res
       .status(409)
-      .json({ message: "Admin already exists", status: 409 });
+      .json({ message: 'Admin already exists', status: 409 });
   }
 
   try {
-    if (!password || typeof password !== "string") {
+    if (!password || typeof password !== 'string') {
       return res
         .status(400)
-        .json({ message: "Password is required and must be a string" });
+        .json({ message: 'Password is required and must be a string' });
     }
 
     const saltRounds = 10;
@@ -183,10 +183,10 @@ const handleNewAdmin = async (req, res) => {
 
     // save admin to the database
     const savedAdmin = await newAdmin.save();
-    res.status(201).json({ admin: savedAdmin, message: "Sign-up completed" });
+    res.status(201).json({ admin: savedAdmin, message: 'Sign-up completed' });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "server error", error: error });
+    res.status(500).json({ message: 'server error', error: error });
   }
 };
 
@@ -226,14 +226,14 @@ const handleUserLogin = async (req, res) => {
   const user = await User.findOne({ email });
 
   if (!user) {
-    return res.status(404).json({ message: "User not found" });
+    return res.status(404).json({ message: 'User not found' });
   }
 
   // Check if the account is disabled
   if (user.accountDisabled) {
     return res.status(403).json({
       message:
-        "Account is disabled due to multiple failed login attempts. Please contact support or verify your OTP.",
+        'Account is disabled due to multiple failed login attempts. Please contact support or verify your OTP.',
     });
   }
 
@@ -251,14 +251,14 @@ const handleUserLogin = async (req, res) => {
 
     await user.save();
 
-    return res.status(401).json({ message: "Incorrect password" });
+    return res.status(401).json({ message: 'Incorrect password' });
   }
 
   user.failedLogin = 0;
   await user.save();
 
   if (!user.isVerified) {
-    return res.status(401).json({ message: "User not verified" });
+    return res.status(401).json({ message: 'User not verified' });
   }
 
   const roles = Object.values(user.roles).filter(Boolean);
@@ -273,21 +273,21 @@ const handleUserLogin = async (req, res) => {
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
-      expiresIn: "1d",
-    },
+      expiresIn: '1d',
+    }
   );
 
   const maxAge = 24 * 60 * 60;
-  res.cookie("accessToken", accessToken, {
+  res.cookie('accessToken', accessToken, {
     httpOnly: true,
     maxAge: maxAge * 1000,
-    sameSite: "none",
+    sameSite: 'none',
     secure: true,
     partitioned: true,
   });
 
   res.status(201).json({
-    message: "Login successful",
+    message: 'Login successful',
     accessToken: accessToken,
   });
 };
@@ -326,14 +326,14 @@ const handleAdminLogin = async (req, res) => {
   const user = await User.findOne({ email });
 
   if (!user) {
-    return res.status(404).json({ message: "User not found" });
+    return res.status(404).json({ message: 'User not found' });
   }
 
   // Check if the account is disabled
   if (user.accountDisabled) {
     return res.status(403).json({
       message:
-        "Account is disabled due to multiple failed login attempts. Please contact support or verify your OTP.",
+        'Account is disabled due to multiple failed login attempts. Please contact support or verify your OTP.',
     });
   }
 
@@ -351,14 +351,14 @@ const handleAdminLogin = async (req, res) => {
 
     await user.save();
 
-    return res.status(401).json({ message: "Incorrect password" });
+    return res.status(401).json({ message: 'Incorrect password' });
   }
 
   user.failedLogin = 0;
   await user.save();
 
   if (!user.isVerified) {
-    return res.status(401).json({ message: "User not verified" });
+    return res.status(401).json({ message: 'User not verified' });
   }
 
   const roles = Object.values(user.roles);
@@ -371,13 +371,13 @@ const handleAdminLogin = async (req, res) => {
       },
     },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "5m" },
+    { expiresIn: '5m' }
   );
 
   const refreshToken = jwt.sign(
     { name: user.name },
     process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: "1d" },
+    { expiresIn: '1d' }
   );
 
   //Saving refreshToken with current user
@@ -385,19 +385,19 @@ const handleAdminLogin = async (req, res) => {
   await foundUser.save();
 
   //Saving refresh tokens with current users
-  res.cookie("refreshToken", refreshToken, {
+  res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000,
-    sameSite: "none",
+    sameSite: 'none',
     secure: true,
     partitioned: true,
   });
 
   const maxAge = 2 * 60;
-  res.cookie("accessToken", accessToken, {
+  res.cookie('accessToken', accessToken, {
     httpOnly: true,
     maxAge: maxAge * 1000,
-    sameSite: "none",
+    sameSite: 'none',
     secure: true,
     partitioned: true,
   });
@@ -466,13 +466,13 @@ const handleRefreshToken = async (req, res) => {
         },
       },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "2m" },
+      { expiresIn: '2m' }
     );
     const maxAge = 2 * 60;
-    res.cookie("accessToken", accessToken, {
+    res.cookie('accessToken', accessToken, {
       httpOnly: true,
       maxAge: maxAge * 1000,
-      sameSite: "None",
+      sameSite: 'None',
       secure: true,
       partitioned: true,
     });
@@ -498,17 +498,17 @@ const handleLogout = async (req, res) => {
   // On client, also delete the accessToken
   const cookies = req.cookies;
 
-  if (cookies.accessToken !== "") {
-    res.clearCookie("accessToken", {
+  if (cookies.accessToken !== '') {
+    res.clearCookie('accessToken', {
       httpOnly: true,
       maxAge: 2 * 60 * 1000,
-      sameSite: "none",
+      sameSite: 'none',
       secure: true,
       partitioned: true,
     });
     return res.sendStatus(204);
   }
-  if (cookies.refreshToken === "") {
+  if (cookies.refreshToken === '') {
     return res.sendStatus(204);
   }
 
@@ -520,16 +520,16 @@ const handleLogout = async (req, res) => {
   // Delete refreshToken in db
   foundUser.refreshToken = null;
   await foundUser.save();
-  res.clearCookie("accessToken", {
+  res.clearCookie('accessToken', {
     httpOnly: true,
-    sameSite: "none",
+    sameSite: 'none',
     secure: true,
     maxAge: 2 * 60 * 1000,
     partitioned: true,
   });
-  res.clearCookie("refreshToken", {
+  res.clearCookie('refreshToken', {
     httpOnly: true,
-    sameSite: "none",
+    sameSite: 'none',
     secure: true,
     maxAge: 24 * 60 * 60 * 1000,
     partitioned: true,
@@ -603,12 +603,12 @@ const sendOtp = async (req, res) => {
   const { email } = req.body;
 
   if (!email) {
-    return res.status(400).json({ message: "Email is required" });
+    return res.status(400).json({ message: 'Email is required' });
   }
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: 'User not found' });
     }
 
     if (user.otp) {
@@ -624,7 +624,7 @@ const sendOtp = async (req, res) => {
     user.otp = encryptedOtp;
     await user.save();
 
-    await novuRoot.trigger("password-reset", {
+    await novuRoot.trigger('password-reset', {
       to: {
         subscriberId: user._id,
         email: user.email,
@@ -635,10 +635,10 @@ const sendOtp = async (req, res) => {
       },
     });
 
-    res.status(200).json({ message: "OTP sent successfully" });
+    res.status(200).json({ message: 'OTP sent successfully' });
   } catch (error) {
-    console.error("Error sending OTP:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error('Error sending OTP:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -717,24 +717,24 @@ const verifyOtp = async (req, res) => {
   if (!email || !otp || !newPassword) {
     return res
       .status(400)
-      .json({ message: "Email, OTP, and newPassword are required" });
+      .json({ message: 'Email, OTP, and newPassword are required' });
   }
 
   try {
     // Find the user by email
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: 'User not found' });
     }
 
     // Compare the provided OTP with the stored hashed OTP
     const isMatch = await bcrypt.compare(otp, user.otp);
 
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid OTP" });
+      return res.status(400).json({ message: 'Invalid OTP' });
     }
 
-    await novuRoot.trigger("password-change-successfull", {
+    await novuRoot.trigger('password-change-successfull', {
       to: {
         subscriberId: user._id,
         email: user.email,
@@ -751,10 +751,10 @@ const verifyOtp = async (req, res) => {
     user.accountDisabled = false;
     await user.save();
 
-    res.status(200).json({ message: "Password updated successfully" });
+    res.status(200).json({ message: 'Password updated successfully' });
   } catch (error) {
-    console.error("Error verifying OTP:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error('Error verifying OTP:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 

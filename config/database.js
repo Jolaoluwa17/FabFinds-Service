@@ -1,7 +1,7 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 // Set strictQuery option to true
-mongoose.set("strictQuery", true);
+mongoose.set('strictQuery', true);
 
 // Connect to MongoDB
 async function connectToDatabase() {
@@ -10,9 +10,9 @@ async function connectToDatabase() {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log("Connected to MongoDB");
+    console.log('Connected to MongoDB');
   } catch (error) {
-    console.error("Failed to connect to MongoDB:", error);
+    console.error('Failed to connect to MongoDB:', error);
   }
 }
 

@@ -1,4 +1,4 @@
-const main = require("cloudinary").v2;
+const main = require('cloudinary').v2;
 
 main.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

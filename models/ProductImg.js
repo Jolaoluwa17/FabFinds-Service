@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const ProductImgSchema = new mongoose.Schema(
   {
     fileUrl: {
@@ -18,6 +18,6 @@ const ProductImgSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
-module.exports = mongoose.model("ProductImg", ProductImgSchema);
+module.exports = mongoose.model('ProductImg', ProductImgSchema);

@@ -1,4 +1,4 @@
-const supportTeam = "olusanyajolaoluwa17@gmail.com";
+const supportTeam = 'olusanyajolaoluwa17@gmail.com';
 const emailTemplate = (generatedOtp, userName) => `<!DOCTYPE html>
 <html
   lang="en"

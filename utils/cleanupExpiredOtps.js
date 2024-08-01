@@ -1,10 +1,10 @@
-const cron = require("node-cron");
-const Otp = require("../models/Otp");
-const User = require("../models/User");
+const cron = require('node-cron');
+const Otp = require('../models/Otp');
+const User = require('../models/User');
 
 const cleanupExpiredOtps = () => {
   // Schedule a cron job to run every minute
-  cron.schedule("* * * * *", async () => {
+  cron.schedule('* * * * *', async () => {
     try {
       // Find expired OTPs where expired field is true
       const expiredOtps = await Otp.find({
@@ -18,7 +18,7 @@ const cleanupExpiredOtps = () => {
         await Otp.findByIdAndDelete(otp._id);
       }
     } catch (error) {
-      console.error("Error cleaning up expired OTPs:", error);
+      console.error('Error cleaning up expired OTPs:', error);
     }
   });
 };

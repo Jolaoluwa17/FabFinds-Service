@@ -22,7 +22,7 @@
  *         name: Male
  */
 
-const Category = require("../models/Category");
+const Category = require('../models/Category');
 
 /**
  * @swagger
@@ -51,7 +51,7 @@ const getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find();
     if (categories.length === 0) {
-      return res.status(404).json({ message: "No categories found" });
+      return res.status(404).json({ message: 'No categories found' });
     }
     return res.status(200).json(categories);
   } catch (err) {
@@ -115,7 +115,7 @@ const getCategory = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
     if (!category) {
-      return res.status(404).json({ message: "category not found" });
+      return res.status(404).json({ message: 'category not found' });
     }
     return res.status(200).json(category);
   } catch (err) {
@@ -156,16 +156,16 @@ const updateCategory = async (req, res) => {
     const updatedCategory = await Category.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true, runValidators: true },
+      { new: true, runValidators: true }
     );
     if (!updatedCategory) {
-      return res.status(404).json({ message: "Category not found" });
+      return res.status(404).json({ message: 'Category not found' });
     }
     return res.status(200).json(updatedCategory);
   } catch (err) {
     return res
       .status(500)
-      .json({ message: "Server error", error: err.message });
+      .json({ message: 'Server error', error: err.message });
   }
 };
 
@@ -196,10 +196,10 @@ const deleteCategory = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
     if (!category) {
-      return res.status(404).json({ message: "category not found" });
+      return res.status(404).json({ message: 'category not found' });
     }
     await category.deleteOne({ _id: req.params.id });
-    return res.status(200).json({ message: "category has been deleted..." });
+    return res.status(200).json({ message: 'category has been deleted...' });
   } catch (err) {
     return res.status(500).json(err);
   }

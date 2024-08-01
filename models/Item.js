@@ -1,10 +1,10 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const itemSchema = new mongoose.Schema(
   {
     product: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
+      ref: 'Product',
     },
     quantity: {
       type: Number,
@@ -15,16 +15,16 @@ const itemSchema = new mongoose.Schema(
     },
     size: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Size",
+      ref: 'Size',
     },
     color: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Color",
+      ref: 'Color',
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
-const Item = mongoose.model("Item", itemSchema);
+const Item = mongoose.model('Item', itemSchema);
 
 module.exports = Item;

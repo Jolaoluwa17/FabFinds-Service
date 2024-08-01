@@ -1,7 +1,7 @@
-const Product = require("../models/Product");
-const cloudinary = require("../utils/cloudinary");
-const ProductImg = require("../models/ProductImg");
-const multer = require("../utils/multer");
+const Product = require('../models/Product');
+const cloudinary = require('../utils/cloudinary');
+const ProductImg = require('../models/ProductImg');
+const multer = require('../utils/multer');
 const maxImages = 5;
 
 /**
@@ -72,15 +72,15 @@ const maxImages = 5;
 const getAllProducts = async (req, res) => {
   try {
     const products = await Product.find()
-      .populate("productImg")
-      .populate("sizes")
-      .populate("colors");
+      .populate('productImg')
+      .populate('sizes')
+      .populate('colors');
     if (products.length === 0) {
-      return res.status(404).json({ message: "no products found" });
+      return res.status(404).json({ message: 'no products found' });
     }
     return res.status(200).json(products);
   } catch (err) {
-    return res.status(500).json({ message: "an error occurred", error: err });
+    return res.status(500).json({ message: 'an error occurred', error: err });
   }
 };
 
@@ -126,21 +126,21 @@ const getAllProducts = async (req, res) => {
 const createNewProduct = async (req, res) => {
   try {
     // Use multer to upload the images
-    multer.upload.array("productImg", maxImages)(req, res, async (err) => {
+    multer.upload.array('productImg', maxImages)(req, res, async (err) => {
       if (err) {
         if (err instanceof multer.MulterError) {
           return res
             .status(400)
-            .json({ message: "File upload error", error: err });
+            .json({ message: 'File upload error', error: err });
         } else {
           return res
             .status(500)
-            .json({ message: "File upload error", error: err });
+            .json({ message: 'File upload error', error: err });
         }
       }
 
       if (!req.files || req.files.length === 0) {
-        return res.status(400).json({ message: "No files uploaded" });
+        return res.status(400).json({ message: 'No files uploaded' });
       }
 
       // Array to store the references to the uploaded images
@@ -150,7 +150,7 @@ const createNewProduct = async (req, res) => {
         // Upload each image to Cloudinary
         for (const file of req.files) {
           const result = await cloudinary.main.uploader.upload(file.path, {
-            folder: "/Product",
+            folder: '/Product',
           });
 
           // Create a new ProductImg document with image details
@@ -173,17 +173,17 @@ const createNewProduct = async (req, res) => {
         });
 
         return res.status(201).json({
-          message: "Product created successfully",
+          message: 'Product created successfully',
           product: product,
         });
       } catch (error) {
         return res
           .status(500)
-          .json({ message: "Error processing images", error: error });
+          .json({ message: 'Error processing images', error: error });
       }
     });
   } catch (err) {
-    return res.status(500).json({ message: "An error occurred", error: err });
+    return res.status(500).json({ message: 'An error occurred', error: err });
   }
 };
 
@@ -212,15 +212,15 @@ const createNewProduct = async (req, res) => {
 const getProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id).populate(
-      "productImg",
+      'productImg'
     );
 
     if (!product) {
-      return res.status(404).json({ message: "product not found" });
+      return res.status(404).json({ message: 'product not found' });
     }
     return res.status(200).json(product);
   } catch (err) {
-    return res.status(500).json({ message: "an error occurred", error: err });
+    return res.status(500).json({ message: 'an error occurred', error: err });
   }
 };
 
@@ -282,7 +282,7 @@ const updateProduct = async (req, res) => {
     const product = await Product.findById(req.params.id);
 
     if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: 'Product not found' });
     }
 
     // Calculate the number of additional pictures that can be added
@@ -291,11 +291,11 @@ const updateProduct = async (req, res) => {
     if (remainingSlots === 0) {
       return res
         .status(400)
-        .json({ message: "Maximum number of images reached" });
+        .json({ message: 'Maximum number of images reached' });
     }
 
     // Create a multer middleware to handle the file upload
-    const newUpload = multer.upload.array("productImg", maxImages);
+    const newUpload = multer.upload.array('productImg', maxImages);
 
     // Use the multer middleware
     newUpload(req, res, async (err) => {
@@ -304,11 +304,11 @@ const updateProduct = async (req, res) => {
           if (err instanceof multer.MulterError) {
             return res
               .status(400)
-              .json({ message: "File upload error", error: err });
+              .json({ message: 'File upload error', error: err });
           } else {
             return res
               .status(500)
-              .json({ message: "File upload error", error: err });
+              .json({ message: 'File upload error', error: err });
           }
         }
 
@@ -326,7 +326,7 @@ const updateProduct = async (req, res) => {
         if (req.files && req.files.length > 0) {
           for (const file of req.files) {
             const result = await cloudinary.main.uploader.upload(file.path, {
-              folder: "/Product",
+              folder: '/Product',
             });
 
             const newProductImg = new ProductImg({
@@ -353,23 +353,23 @@ const updateProduct = async (req, res) => {
         const updatedProduct = await Product.findByIdAndUpdate(
           req.params.id,
           updateData,
-          { new: true },
+          { new: true }
         );
 
         return res.status(200).json({
-          message: "Product updated successfully",
+          message: 'Product updated successfully',
           product: updatedProduct,
         });
       } catch (err) {
         console.log(err);
         return res
           .status(500)
-          .json({ message: "An error occurred", error: err });
+          .json({ message: 'An error occurred', error: err });
       }
     });
   } catch (err) {
-    console.error("An error occurred:", err);
-    return res.status(500).json({ message: "An error occurred", error: err });
+    console.error('An error occurred:', err);
+    return res.status(500).json({ message: 'An error occurred', error: err });
   }
 };
 
@@ -400,7 +400,7 @@ const deleteProduct = async (req, res) => {
     const product = await Product.findById(req.params.id);
 
     if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: 'Product not found' });
     }
 
     // Check if the product has associated product images
@@ -422,10 +422,10 @@ const deleteProduct = async (req, res) => {
     // Delete the product document
     await product.deleteOne({ _id: req.params.id });
 
-    return res.status(200).json({ message: "Product deleted successfully" });
+    return res.status(200).json({ message: 'Product deleted successfully' });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ message: "An error occurred", error: err });
+    return res.status(500).json({ message: 'An error occurred', error: err });
   }
 };
 

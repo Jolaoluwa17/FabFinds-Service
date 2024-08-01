@@ -1,5 +1,5 @@
-require("dotenv").config();
-const mongoose = require("mongoose");
+require('dotenv').config();
+const mongoose = require('mongoose');
 
 // useNewUrlParser: true,
 // useUnifiedTopology: true,
@@ -11,7 +11,7 @@ const connectDB = async () => {
     const connect = await // mongoose.set("strictQuery", false)
     mongoose.connect(process.env.DB_URL, { useNewUrlParser: true });
 
-    console.log("MongoDB connected: ", connect.connection.host);
+    console.log('MongoDB connected: ', connect.connection.host);
   } catch (err) {
     console.log(err);
     process.exit(1);

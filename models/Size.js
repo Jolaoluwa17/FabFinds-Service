@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const sizeSchema = new mongoose.Schema({
   name: {
@@ -11,6 +11,6 @@ const sizeSchema = new mongoose.Schema({
   },
 });
 
-const Size = mongoose.model("Size", sizeSchema);
+const Size = mongoose.model('Size', sizeSchema);
 
 module.exports = Size;

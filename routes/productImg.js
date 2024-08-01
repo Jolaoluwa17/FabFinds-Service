@@ -1,8 +1,8 @@
-const router = require("express").Router();
-const productImgController = require("../controllers/productImgController");
+const router = require('express').Router();
+const productImgController = require('../controllers/productImgController');
 
 router
-  .route("/:id")
+  .route('/:id')
   .get(productImgController.getImageById)
   .delete(productImgController.deleteImageById);
 

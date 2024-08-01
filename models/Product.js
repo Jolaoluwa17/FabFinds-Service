@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema(
   {
@@ -22,37 +22,37 @@ const productSchema = new mongoose.Schema(
     productImg: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "ProductImg",
+        ref: 'ProductImg',
         required: true,
       },
     ],
     category: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
+      ref: 'Category',
       required: true,
     },
     collections: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Collection",
+        ref: 'Collection',
       },
     ],
     sizes: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Size",
+        ref: 'Size',
       },
     ],
     colors: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Color",
+        ref: 'Color',
       },
     ],
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
-const Product = mongoose.model("Product", productSchema);
+const Product = mongoose.model('Product', productSchema);
 
 module.exports = Product;

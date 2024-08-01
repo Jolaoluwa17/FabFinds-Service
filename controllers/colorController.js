@@ -1,4 +1,4 @@
-const Color = require("../models/Color");
+const Color = require('../models/Color');
 
 // Create a new color
 const createColor = async (req, res) => {
@@ -28,7 +28,7 @@ const getColorById = async (req, res) => {
   try {
     const color = await Color.findById(id);
     if (!color) {
-      return res.status(404).json({ message: "Color not found" });
+      return res.status(404).json({ message: 'Color not found' });
     }
     res.json(color);
   } catch (error) {
@@ -45,10 +45,10 @@ const updateColor = async (req, res) => {
     const updatedColor = await Color.findByIdAndUpdate(
       id,
       { colorName },
-      { new: true },
+      { new: true }
     );
     if (!updatedColor) {
-      return res.status(404).json({ message: "Color not found" });
+      return res.status(404).json({ message: 'Color not found' });
     }
     res.json(updatedColor);
   } catch (error) {
@@ -63,9 +63,9 @@ const deleteColor = async (req, res) => {
   try {
     const deletedColor = await Color.findByIdAndDelete(id);
     if (!deletedColor) {
-      return res.status(404).json({ message: "Color not found" });
+      return res.status(404).json({ message: 'Color not found' });
     }
-    res.json({ message: "Color deleted successfully" });
+    res.json({ message: 'Color deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

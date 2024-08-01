@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const collectionSchema = new mongoose.Schema(
   {
@@ -12,7 +12,7 @@ const collectionSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
-module.exports = mongoose.model("Collection", collectionSchema);
+module.exports = mongoose.model('Collection', collectionSchema);

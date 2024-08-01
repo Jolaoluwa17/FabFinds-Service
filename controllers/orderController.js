@@ -1,12 +1,12 @@
-const Cart = require("../models/Cart");
-const Order = require("../models/Order");
+const Cart = require('../models/Cart');
+const Order = require('../models/Order');
 
 // GET all orders
 const getAllOrder = async (req, res) => {
   try {
     const orders = await Order.find();
     if (orders.length === 0) {
-      return res.status(404).json({ message: "no orders found" });
+      return res.status(404).json({ message: 'no orders found' });
     }
     return res.status(200), json(orders);
   } catch (err) {
@@ -32,16 +32,16 @@ const createOrderFromCart = async (req, res) => {
 
   try {
     // Find the cart by ID
-    const cart = await Cart.findById(cartId).populate("items");
+    const cart = await Cart.findById(cartId).populate('items');
 
     if (!cart) {
-      return res.status(404).json({ error: "Cart not found" });
+      return res.status(404).json({ error: 'Cart not found' });
     }
 
     // Calculate the total price
     const totalPrice = cart.items.reduce(
       (acc, item) => acc + item.price * item.quantity,
-      0,
+      0
     );
 
     // Create a new order
@@ -51,7 +51,7 @@ const createOrderFromCart = async (req, res) => {
       totalPrice,
       shippingAddress,
       orderDate: new Date(),
-      status: "Pending",
+      status: 'Pending',
     });
 
     // Save the order to the database
@@ -63,7 +63,7 @@ const createOrderFromCart = async (req, res) => {
 
     res.status(201).json(savedOrder); // Respond with the created order
   } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: 'Server error' });
   }
 };
 
@@ -72,7 +72,7 @@ const getOrder = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
     if (!order) {
-      return res.status(404).json({ message: "order not found" });
+      return res.status(404).json({ message: 'order not found' });
     }
     return res.status(200).json(order);
   } catch (err) {
@@ -86,24 +86,24 @@ const getOrderByUserId = async (req, res) => {
     const userId = req.params.id;
     const orders = await Order.find({ user: userId })
       .populate({
-        path: "items",
+        path: 'items',
         populate: {
-          path: "product",
-          select: "name",
+          path: 'product',
+          select: 'name',
         },
       })
       .populate({
-        path: "items",
+        path: 'items',
         populate: {
-          path: "size",
-          select: "suffix",
+          path: 'size',
+          select: 'suffix',
         },
       })
       .populate({
-        path: "items",
+        path: 'items',
         populate: {
-          path: "color",
-          select: "name",
+          path: 'color',
+          select: 'name',
         },
       });
     return res.status(200).json(orders);
@@ -116,8 +116,8 @@ const shippedOrder = async (req, res) => {
   try {
     const updatedOrder = await Order.findByIdAndUpdate(
       req.params.id,
-      { status: "Shipped" },
-      { new: true },
+      { status: 'Shipped' },
+      { new: true }
     );
     return res.status(200).json(updatedOrder);
   } catch (err) {
@@ -129,8 +129,8 @@ const deliveredOrder = async (req, res) => {
   try {
     const updatedOrder = await Order.findByIdAndUpdate(
       req.params.id,
-      { status: "Delivered" },
-      { new: true },
+      { status: 'Delivered' },
+      { new: true }
     );
     return res.status(200).json(updatedOrder);
   } catch (err) {
@@ -142,8 +142,8 @@ const canceledOrder = async (req, res) => {
   try {
     const updatedOrder = await Order.findByIdAndUpdate(
       req.params.id,
-      { status: "Canceled" },
-      { new: true },
+      { status: 'Canceled' },
+      { new: true }
     );
     return res.status(200).json(updatedOrder);
   } catch (err) {
@@ -156,10 +156,10 @@ const deleteOrder = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
     if (!order) {
-      return res.status(404).json({ message: "order not found" });
+      return res.status(404).json({ message: 'order not found' });
     }
     await Review.deleteOne({ _id: req.params.id });
-    return res.status(200).json("order has been deleted...");
+    return res.status(200).json('order has been deleted...');
   } catch (err) {
     return res.status(500).json(err);
   }

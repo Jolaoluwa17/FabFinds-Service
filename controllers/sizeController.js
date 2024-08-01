@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const Size = require("../models/Size");
+const mongoose = require('mongoose');
+const Size = require('../models/Size');
 
 const createSize = async (req, res) => {
   try {
@@ -26,7 +26,7 @@ const getSizeById = async (req, res) => {
   try {
     const size = await Size.findById(id);
     if (!size) {
-      return res.status(404).json({ message: "Size not found" });
+      return res.status(404).json({ message: 'Size not found' });
     }
     res.json(size);
   } catch (error) {
@@ -42,10 +42,10 @@ const updateSize = async (req, res) => {
     const updatedSize = await Size.findByIdAndUpdate(
       id,
       { sizeName },
-      { new: true },
+      { new: true }
     );
     if (!updatedSize) {
-      return res.status(404).json({ message: "Size not found" });
+      return res.status(404).json({ message: 'Size not found' });
     }
     res.json(updatedSize);
   } catch (error) {
@@ -59,9 +59,9 @@ const deleteSize = async (req, res) => {
   try {
     const deletedSize = await Size.findByIdAndDelete(id);
     if (!deletedSize) {
-      return res.status(404).json({ message: "Size not found" });
+      return res.status(404).json({ message: 'Size not found' });
     }
-    res.json({ message: "Size deleted successfully" });
+    res.json({ message: 'Size deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
